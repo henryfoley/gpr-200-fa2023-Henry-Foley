@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <math.h>
+#include <ctime>
 
 #include <ew/external/glad.h>
 #include <ew/ewMath/ewMath.h>
@@ -32,8 +33,17 @@ Vertex vertices[4] = {
 	{-1,  1, 0.0, 0.0, 1.0}	 //Top Left
 };
 
-float triangleColor[3] = { 1.0f, 0.5f, 0.0f };
-float triangleBrightness = 1.0f;
+//Shader Parameter
+std::time_t currentTime = std::time(nullptr);
+float daySkyColor[3] = { 1.0f, 0.5f, 0.0f };
+float dayGroundColor[3] = { 1.0f, 0.31f, 0.0f };
+float nightSkyColor[3] = { 0.45f, 0.0f, 0.32f };
+float nightGroundColor[3] = { 0.195f, 0.25f, 0.32f };
+float sunTopColor[3] = { 1.0f, 0.545f, 0.0f };
+float sunBottomColor[3] = { 1.0f, 0.2f, 0.0f };
+float skylineColor[4] = { 0.0f, 0.0f, 0.0f, 0.8f};
+float sunSpeed = 1.0f;
+float sunRadius = 1.0f;
 bool showImGUIDemoWindow = true;
 
 int main() {
@@ -73,8 +83,6 @@ int main() {
 	glBindVertexArray(vao);
 
 	std::string shaderSource = HenryLib::loadShaderSourceFromFile("assets/fragmentShader.frag");
-	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
 	while (!glfwWindowShouldClose(window)) {
 		glfwPollEvents();
@@ -82,8 +90,17 @@ int main() {
 		glClear(GL_COLOR_BUFFER_BIT);
 
 		//Set uniforms
-		shader.setVec3("_Color", triangleColor[0], triangleColor[1], triangleColor[2]);
-		shader.setFloat("_Brightness", triangleBrightness);
+		shader.setFloat("iTime", currentTime);
+		shader.setVec2("iResolution", SCREEN_WIDTH, SCREEN_HEIGHT);
+		shader.setVec3("_daySkyColor", daySkyColor[0], daySkyColor[1], daySkyColor[2]);
+		shader.setVec3("_dayGroundColor", dayGroundColor[0], dayGroundColor[1], dayGroundColor[2]);
+		shader.setVec3("_nightSkyColor", nightSkyColor[0], nightSkyColor[1], daySkyColor[2]);
+		shader.setVec3("_nightGroundColor", nightGroundColor[0], nightGroundColor[1], nightGroundColor[2]);
+		shader.setVec3("_sunTopColor", sunTopColor[0], sunTopColor[1], sunTopColor[2]);
+		shader.setVec3("_sunBottomColor", sunBottomColor[0], sunBottomColor[1], sunBottomColor[2]);
+		shader.setVec4("_skylineColor", skylineColor[0], skylineColor[1], skylineColor[2], skylineColor[3]);
+		shader.setFloat("_sunSpeed", sunSpeed);
+		shader.setFloat("_sunRadius", sunRadius);
 
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, NULL);
 
@@ -96,8 +113,20 @@ int main() {
 
 			ImGui::Begin("Settings");
 			ImGui::Checkbox("Show Demo Window", &showImGUIDemoWindow);
-			ImGui::ColorEdit3("Color", triangleColor);
-			ImGui::SliderFloat("Brightness", &triangleBrightness, 0.0f, 1.0f);
+
+			//Colors
+			ImGui::ColorEdit3("Day Sky Color", daySkyColor);
+			ImGui::ColorEdit3("Day Ground Color", dayGroundColor);
+			ImGui::ColorEdit3("Night Sky Color", nightSkyColor);
+			ImGui::ColorEdit3("Night Ground Color", nightGroundColor);
+			ImGui::ColorEdit3("Sun Top Color", sunTopColor);
+			ImGui::ColorEdit3("Sun Bottom Color", sunBottomColor);
+			ImGui::ColorEdit3("Skyline Color", skylineColor);
+
+			//Speed & Radius
+			ImGui::SliderFloat("Speed", &sunSpeed, 0.1f, 2.0f);
+			ImGui::SliderFloat("Radius", &sunRadius, 0.1f, 2.0f);
+
 			ImGui::End();
 			if (showImGUIDemoWindow) {
 				ImGui::ShowDemoWindow(&showImGUIDemoWindow);
