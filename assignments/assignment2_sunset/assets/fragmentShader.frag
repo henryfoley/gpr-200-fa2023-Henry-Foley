@@ -45,6 +45,8 @@ void main()
 
     // Output to screen
     vec3 col = mix(sky, sunColor, sunMask);
+    col = sky;
     //col = mix(col, skylineColor.rgb, skyline*skylineColor.a);
 	FragColor = vec4(col,1.0);
+    //FragColor = vec4(UV,0.0,1.0);
 }
