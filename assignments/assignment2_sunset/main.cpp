@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <math.h>
-#include <ctime>
+
 
 #include <ew/external/glad.h>
 #include <ew/ewMath/ewMath.h>
@@ -34,7 +34,7 @@ Vertex vertices[4] = {
 };
 
 //Shader Parameter
-std::time_t currentTime = std::time(nullptr);
+
 float daySkyColor[3] = { 1.0f, 0.5f, 0.0f };
 float dayGroundColor[3] = { 1.0f, 0.31f, 0.0f };
 float nightSkyColor[3] = { 0.45f, 0.0f, 0.32f };
@@ -43,7 +43,7 @@ float sunTopColor[3] = { 1.0f, 0.545f, 0.0f };
 float sunBottomColor[3] = { 1.0f, 0.2f, 0.0f };
 float skylineColor[4] = { 0.0f, 0.0f, 0.0f, 0.8f};
 float sunSpeed = 1.0f;
-float sunRadius = 1.0f;
+float sunRadius = 0.25f;
 bool showImGUIDemoWindow = true;
 
 int main() {
@@ -87,6 +87,10 @@ int main() {
 		glClearColor(0.3f, 0.4f, 0.9f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 
+		//Set time
+		float currentTime = glfwGetTime();
+
+
 		//Set uniforms
 		shader.setFloat("iTime", currentTime);
 		shader.setVec2("iResolution", SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -115,15 +119,15 @@ int main() {
 			//Colors
 			ImGui::ColorEdit3("Day Sky Color", daySkyColor);
 			ImGui::ColorEdit3("Day Ground Color", dayGroundColor);
-			ImGui::ColorEdit3("Night Sky Color", nightSkyColor);
-			ImGui::ColorEdit3("Night Ground Color", nightGroundColor);
+			ImGui::ColorEdit3("Night Sky Color", nightGroundColor);
+			ImGui::ColorEdit3("Night Groun Color", nightSkyColor);
 			ImGui::ColorEdit3("Sun Top Color", sunTopColor);
 			ImGui::ColorEdit3("Sun Bottom Color", sunBottomColor);
 			ImGui::ColorEdit3("Skyline Color", skylineColor);
 
 			//Speed & Radius
 			ImGui::SliderFloat("Speed", &sunSpeed, 0.1f, 2.0f);
-			ImGui::SliderFloat("Radius", &sunRadius, 0.1f, 2.0f);
+			ImGui::SliderFloat("Radius", &sunRadius, 0.1f, 0.5f);
 
 			ImGui::End();
 			if (showImGUIDemoWindow) {
