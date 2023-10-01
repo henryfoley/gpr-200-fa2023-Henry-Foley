@@ -44,6 +44,8 @@ float sunBottomColor[3] = { 1.0f, 0.2f, 0.0f };
 float skylineColor[4] = { 0.0f, 0.0f, 0.0f, 0.8f};
 float sunSpeed = 1.0f;
 float sunRadius = 0.25f;
+float hillAmount = 15.0f;
+float hillSteepness = 0.1f;
 bool showImGUIDemoWindow = true;
 
 int main() {
@@ -103,6 +105,8 @@ int main() {
 		shader.setVec4("_skylineColor", skylineColor[0], skylineColor[1], skylineColor[2], skylineColor[3]);
 		shader.setFloat("_sunSpeed", sunSpeed);
 		shader.setFloat("_sunRadius", sunRadius);
+		shader.setFloat("_hillAmount", hillAmount);
+		shader.setFloat("_hillSteepness", hillSteepness);
 
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, NULL);
 
@@ -128,6 +132,10 @@ int main() {
 			//Speed & Radius
 			ImGui::SliderFloat("Speed", &sunSpeed, 0.1f, 2.0f);
 			ImGui::SliderFloat("Radius", &sunRadius, 0.1f, 0.5f);
+
+			//Hill Controls
+			ImGui::SliderFloat("Hill Amount", &hillAmount, 5.0f, 30.0f);
+			ImGui::SliderFloat("Hill Steepnes", &hillSteepness, 0.01f, 0.3f);
 
 			ImGui::End();
 			if (showImGUIDemoWindow) {
