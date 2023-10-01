@@ -21,6 +21,9 @@ void main()
     vec2 fragCoord = vec2(gl_FragCoord.x, gl_FragCoord.y);
     float ratio = iResolution.x/iResolution.y;
     vec2 sdfUV = (2.0*fragCoord-iResolution.xy)/iResolution.y;
+    sdfUV = fragCoord/iResolution.xy;
+    sdfUV = sdfUV*2.0 - vec2(1.0);
+    sdfUV *=ratio;
 
     //Skyline
     float sinWave1 = sin(UV.x*_hillAmount)*_hillSteepness + 0.25;

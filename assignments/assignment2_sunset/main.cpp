@@ -90,7 +90,7 @@ int main() {
 		glClear(GL_COLOR_BUFFER_BIT);
 
 		//Set time
-		float currentTime = glfwGetTime();
+		float currentTime = float(glfwGetTime());
 
 
 		//Set uniforms
