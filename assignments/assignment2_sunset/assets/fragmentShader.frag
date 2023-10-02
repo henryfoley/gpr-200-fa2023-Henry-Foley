@@ -20,10 +20,8 @@ void main()
     //Ratio and SDF
     vec2 fragCoord = vec2(gl_FragCoord.x, gl_FragCoord.y);
     float ratio = iResolution.x/iResolution.y;
-    vec2 sdfUV = (2.0*fragCoord-iResolution.xy)/iResolution.y;
-    sdfUV = fragCoord/iResolution.xy;
-    sdfUV = sdfUV*2.0 - vec2(1.0);
-    sdfUV *=ratio;
+    vec2 sdfUV = ((2.0*gl_FragCoord.xy)-iResolution.xy)/iResolution.y;  //This function is identical to the one below, but does not work
+    sdfUV = (2.0*fragCoord-vec2(1080.0,720.0))/720.0;                   //Only this function works, for some reason
 
     //Skyline
     float sinWave1 = sin(UV.x*_hillAmount)*_hillSteepness + 0.25;
@@ -38,8 +36,8 @@ void main()
 
     //Sun
     vec3 sunColor = mix(_sunTopColor, _sunBottomColor, mask);
-    vec2 center = vec2(0.5, (-sin(iTime * _sunSpeed))*0.5);
-    float sunMask = length(center-sdfUV)-_sunRadius;
+    vec2 center = vec2(0.0, ((-sin(iTime * _sunSpeed))*1.0)-0.5);
+    float sunMask = length(sdfUV-center)-_sunRadius; //Add center and -radius back
     sunMask = 1.0 - smoothstep(-0.01,0.01,sunMask);
 
     // Output to screen

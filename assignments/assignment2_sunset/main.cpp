@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <math.h>
+#include <iostream>
 
 
 #include <ew/external/glad.h>
@@ -95,7 +96,7 @@ int main() {
 
 		//Set uniforms
 		shader.setFloat("iTime", currentTime);
-		shader.setVec2("iResolution", SCREEN_WIDTH, SCREEN_HEIGHT);
+		shader.setVec2("iResolution", float(SCREEN_WIDTH), float(SCREEN_HEIGHT));
 		shader.setVec3("_daySkyColor", daySkyColor[0], daySkyColor[1], daySkyColor[2]);
 		shader.setVec3("_dayGroundColor", dayGroundColor[0], dayGroundColor[1], dayGroundColor[2]);
 		shader.setVec3("_nightSkyColor", nightSkyColor[0], nightSkyColor[1], daySkyColor[2]);
