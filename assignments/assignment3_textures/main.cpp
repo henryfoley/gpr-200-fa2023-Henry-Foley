@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <math.h>
+#include <HenLib/texture.h>
 
 #include <ew/external/glad.h>
 #include <ew/ewMath/ewMath.h>
@@ -58,21 +59,45 @@ int main() {
 	ImGui_ImplGlfw_InitForOpenGL(window, true);
 	ImGui_ImplOpenGL3_Init();
 
-	ew::Shader shader("assets/vertexShader.vert", "assets/fragmentShader.frag");
+	ew::Shader background("assets/background.vert", "assets/background.frag");
+	ew::Shader character("assets/character.vert", "assets/character.frag");
+
 
 	unsigned int quadVAO = createVAO(vertices, 4, indices, 6);
 
-	glBindVertexArray(quadVAO);
+	unsigned int brickTexture = loadTexture("assets/bricks.jpg", GL_REPEAT, GL_LINEAR);
+	unsigned int noiseTexture = loadTexture("assets/perlin.png", GL_REPEAT, GL_LINEAR);
+	unsigned int characterTexture = loadTexture("assets/character.png", GL_REPEAT, GL_NEAREST);
+
+
 
 	while (!glfwWindowShouldClose(window)) {
 		glfwPollEvents();
 		glClearColor(0.3f, 0.4f, 0.9f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 
-		//Set uniforms
-		shader.use();
+		glBindVertexArray(quadVAO);
 
+
+
+		//Set Background Uniforms
+		/*background.use();
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, brickTexture);
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, noiseTexture);
+		background.setInt("_BrickTexture",0);
+		background.setInt("_NoiseTexture",1);
+		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, NULL);*/
+	
+		//Set Character Uniforms
+		character.use();
+		glActiveTexture(GL_TEXTURE2);
+		glBindTexture(GL_TEXTURE_2D, characterTexture);
+		character.setInt("_characterTexture", 2);
+		//glEnable(GL_BLEND);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, NULL);
+
 
 		//Render UI
 		{
@@ -123,5 +148,10 @@ unsigned int createVAO(Vertex* vertexData, int numVertices, unsigned short* indi
 void framebufferSizeCallback(GLFWwindow* window, int width, int height)
 {
 	glViewport(0, 0, width, height);
+}
+
+void bindBackgroundTextures()
+{
+
 }
 
