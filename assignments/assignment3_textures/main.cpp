@@ -65,17 +65,18 @@ int main() {
 
 	unsigned int quadVAO = createVAO(vertices, 4, indices, 6);
 
-	unsigned int brickTexture = loadTexture("assets/bricks.jpg", GL_REPEAT, GL_LINEAR);
+	unsigned int crowdTexture = loadTexture("assets/crowd.jpg", GL_REPEAT, GL_LINEAR);
 	unsigned int noiseTexture = loadTexture("assets/perlin.png", GL_REPEAT, GL_LINEAR);
 	unsigned int characterTexture = loadTexture("assets/character.png", GL_CLAMP_TO_EDGE, GL_NEAREST);
+	unsigned int floorTexture = loadTexture("assets/floor.jpg", GL_REPEAT, GL_LINEAR);
 
-	float backgroundTilingAmount = 1.0;
+	float backgroundTilingAmount = 3.0;
 	float distortionAmount = 0.05;
 	float distortionSpeed = 0.125;
 	float characterScale = 1.0;
-
-
-
+	float characterJumpSpeed = 1.0;
+	float characterXOffset = 0.0;
+	float characterYOffset = 0.0;
 
 	while (!glfwWindowShouldClose(window)) {
 		glfwPollEvents();
@@ -90,24 +91,30 @@ int main() {
 		//Set Background Uniforms
 		background.use();
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, brickTexture);
+		glBindTexture(GL_TEXTURE_2D, crowdTexture);
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, noiseTexture);
+		glActiveTexture(GL_TEXTURE2);
+		glBindTexture(GL_TEXTURE_2D, floorTexture);
 		background.setFloat("_Time", currentTime);
 		background.setFloat("_Tiling", backgroundTilingAmount);
 		background.setFloat("_Distortion", distortionAmount);
 		background.setFloat("_DistortionSpeed", distortionSpeed);
-		background.setInt("_BrickTexture",0);
+		background.setInt("_CrowdTexture",0);
 		background.setInt("_NoiseTexture",1);
+		background.setInt("_FloorTexture",2);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, NULL);
 	
 		//Set Character Uniforms
 		character.use();
-		glActiveTexture(GL_TEXTURE2);
+		glActiveTexture(GL_TEXTURE3);
 		glBindTexture(GL_TEXTURE_2D, characterTexture);
 		character.setFloat("_Time", currentTime);
 		character.setFloat("_Scale", characterScale);
-		character.setInt("_CharacterTexture", 2);
+		character.setFloat("_JumpSpeed", characterJumpSpeed);
+		character.setFloat("_XOffset", characterXOffset);
+		character.setFloat("_YOffset", characterYOffset);
+		character.setInt("_CharacterTexture", 3);
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, NULL);
@@ -121,7 +128,12 @@ int main() {
 
 			ImGui::Begin("Settings");
 			ImGui::SliderFloat("Tiling Amount", &backgroundTilingAmount, 0.5f, 10.0f);
-			ImGui::SliderFloat("Character Scale", &characterScale, 0.5f, 2.0f);
+			ImGui::SliderFloat("Distortion Amount", &distortionAmount, 0.0, 0.2);
+			ImGui::SliderFloat("Distortion Speed", &distortionSpeed, 0.0, 0.3);
+			ImGui::SliderFloat("Character Scale", &characterScale, 0.25f, 1.5f);
+			ImGui::SliderFloat("Character Jump Speed", &characterJumpSpeed, 0.0f, 3.0f);
+			ImGui::SliderFloat("Character X Offset", &characterXOffset, -2.5f, 2.5f);
+			ImGui::SliderFloat("Character Y Offset", &characterYOffset, -1.0f, 1.0f);
 			ImGui::End();
 
 			ImGui::Render();
