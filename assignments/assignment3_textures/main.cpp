@@ -67,7 +67,13 @@ int main() {
 
 	unsigned int brickTexture = loadTexture("assets/bricks.jpg", GL_REPEAT, GL_LINEAR);
 	unsigned int noiseTexture = loadTexture("assets/perlin.png", GL_REPEAT, GL_LINEAR);
-	unsigned int characterTexture = loadTexture("assets/character.png", GL_REPEAT, GL_NEAREST);
+	unsigned int characterTexture = loadTexture("assets/character.png", GL_CLAMP_TO_EDGE, GL_NEAREST);
+
+	float backgroundTilingAmount = 1.0;
+	float distortionAmount = 0.05;
+	float distortionSpeed = 0.125;
+	float characterScale = 1.0;
+
 
 
 
@@ -78,24 +84,32 @@ int main() {
 
 		glBindVertexArray(quadVAO);
 
-
+		//Set time
+		float currentTime = float(glfwGetTime());
 
 		//Set Background Uniforms
-		/*background.use();
+		background.use();
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, brickTexture);
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, noiseTexture);
+		background.setFloat("_Time", currentTime);
+		background.setFloat("_Tiling", backgroundTilingAmount);
+		background.setFloat("_Distortion", distortionAmount);
+		background.setFloat("_DistortionSpeed", distortionSpeed);
 		background.setInt("_BrickTexture",0);
 		background.setInt("_NoiseTexture",1);
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, NULL);*/
+		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, NULL);
 	
 		//Set Character Uniforms
 		character.use();
 		glActiveTexture(GL_TEXTURE2);
 		glBindTexture(GL_TEXTURE_2D, characterTexture);
-		character.setInt("_characterTexture", 2);
-		//glEnable(GL_BLEND);
+		character.setFloat("_Time", currentTime);
+		character.setFloat("_Scale", characterScale);
+		character.setInt("_CharacterTexture", 2);
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, NULL);
 
 
@@ -106,6 +120,8 @@ int main() {
 			ImGui::NewFrame();
 
 			ImGui::Begin("Settings");
+			ImGui::SliderFloat("Tiling Amount", &backgroundTilingAmount, 0.5f, 10.0f);
+			ImGui::SliderFloat("Character Scale", &characterScale, 0.5f, 2.0f);
 			ImGui::End();
 
 			ImGui::Render();
