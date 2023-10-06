@@ -119,5 +119,9 @@ namespace HenryLib {
 	{
 		glUniform4f(glGetUniformLocation(mId, name.c_str()), x, y, z, w);
 	}
+	void Shader::setMat4(const std::string& name, const ew::Mat4& v) const
+	{
+		glUniformMatrix4fv(glGetUniformLocation(mId, name.c_str()), 1, GL_FALSE, &v[0][0]);
+	}
 }
 
