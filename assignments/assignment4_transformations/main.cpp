@@ -59,14 +59,14 @@ int main() {
 
 	//Transforms
 	HenLib::Transform cubeTransforms[NUM_MESHES];
-
-	//Cube meshes
-	std::vector<ew::Mesh> cubeMeshes;
-	/*for (size_t i = 0; i < NUM_MESHES; i++)
+	std::vector<ew::Vec3> cubePositions = { ew::Vec3(0.5f, 0.5f, 0.0f), ew::Vec3(0.5f, -0.5f, 0.0f),
+											ew::Vec3(-0.5f, -0.5f, 0.0f), ew::Vec3(-0.5f, 0.5f, 0.0f) };
+	for (size_t i = 0; i < NUM_MESHES; i++)
 	{
-		ew::Mesh cubeMesh(ew::createCube(0.5f));
-		cubeMeshes.push_back(cubeMesh);
-	}*/
+		cubeTransforms[i].position = cubePositions[i];
+	}
+
+	//Cube meshe
 	ew::Mesh cubeMesh(ew::createCube(0.5f));
 	
 	while (!glfwWindowShouldClose(window)) {
@@ -76,19 +76,12 @@ int main() {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		//Set uniforms
-		
 		for (size_t i = 0; i < NUM_MESHES; i++)
 		{
 			shader.use();
 			shader.setMat4("_Model", cubeTransforms[i].getModelMatrix());
 			cubeMesh.draw();
 		}
-
-		//Draw Meshes
-		/*for (size_t i = 0; i< cubeMeshes.size(); i++)
-		{ 
-			cubeMeshes[i].draw();
-		}*/
 	
 		//Render UI
 		{
@@ -99,13 +92,12 @@ int main() {
 			for (size_t i = 0; i < NUM_MESHES; i++)
 			{
 				ImGui::PushID(i);
-				if (ImGui::CollapsingHeader("Transform"))
-				{
+				if (ImGui::CollapsingHeader("Transform")){
 					ImGui::DragFloat3("Position", &cubeTransforms[i].position.x, 0.05f);
 					ImGui::DragFloat3("Rotation", &cubeTransforms[i].rotation.x, 1.0f);
 					ImGui::DragFloat3("Scale", &cubeTransforms[i].scale.x, 0.05f);
 				}
-				ImGui::PopID;
+				ImGui::PopID();
 			}
 
 			ImGui::Render();
