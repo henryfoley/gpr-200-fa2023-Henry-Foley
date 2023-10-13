@@ -1,6 +1,7 @@
 #pragma once
 #include "../ew/ewMath/mat4.h"
 #include "../ew/ewMath/vec3.h"
+#include "../ew/ewMath/ewMath.h"
 
 namespace HenLib {
 	//Identity Matrix
@@ -75,6 +76,40 @@ namespace HenLib {
 				* HenLib::RotateZXY(rotation.z, rotation.x, rotation.y)
 				* HenLib::Scale(scale);
 		}
+	};
+	
+	//Creates a right handed view space
+	//eye = eye (camera) position
+	//target = position to look at
+	//up = up axis, usually(0,1,0)
+	inline ew::Mat4 LookAt(ew::Vec3 eye, ew::Vec3 target, ew::Vec3 up) {
+		ew::Vec3 fwd = ew::Normalize(eye-target);
+		ew::Vec3 right = ew::Normalize(ew::Cross(up,fwd));
+		up = ew::Normalize(ew::Cross(fwd,right));
+
+		return ew::Mat4(
+			right.x, right.y, right.z, -ew::Dot(right, eye),
+			   up.x,    up.y,    up.z, -ew::Dot(up,	   eye),
+			  fwd.x,   fwd.y,   fwd.z, -ew::Dot(fwd,   eye),
+				  0,	   0,		0, 1
+		);	 
+	};
+
+	//Orthographic Projection
+	inline ew::Mat4 Orthographic(float height, float aspect, float near,
+		float far) {
+		float r = height * aspect;
+		float l = -r;
+		float t = height / 2;
+		float b = -t;
+
+	};
+
+	//Perspective projection
+	//fov = vertical aspect ratio (radians)
+	inline ew::Mat4 Perspective(float fov, float aspect, float near,
+		float far) {
+
 	};
 }
 
