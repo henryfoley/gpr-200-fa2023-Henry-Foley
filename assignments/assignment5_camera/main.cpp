@@ -87,7 +87,9 @@ int main() {
 		//Set uniforms
 		shader.use();
 
+		
 		//TODO: Set model matrix uniform
+		// LIKELY PROBLEM
 		for (size_t i = 0; i < NUM_CUBES; i++)
 		{
 			//View Projection
