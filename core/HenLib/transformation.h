@@ -106,7 +106,7 @@ namespace HenLib {
 		return ew::Mat4(
 			2/(r - l), 0,				   0,			-(r+l)/(r-l),
 			0, 2/(t - b),				   0,			-(t+b)/(t-b),
-			0,			 0,   2/(far - near), -(far+near)/(far-near),
+			0,			 0,  -2/(far - near), -(far+near)/(far-near),
 			0,			 0,				   0, 1
 		);
 	};
@@ -118,7 +118,7 @@ namespace HenLib {
 		return ew::Mat4(
 			1/(tan(fov/2)*aspect), 0, 0, 0,
 			0, 1/(tan(fov/2)), 0, 0,
-			0, 0, (near+far)/(near-far), (2*far*near)/(near-far),
+			0, 0, (near+far)/(near-far), -(2*far*near)/(near-far),
 			0, 0, -1, 0
 		);
 	};

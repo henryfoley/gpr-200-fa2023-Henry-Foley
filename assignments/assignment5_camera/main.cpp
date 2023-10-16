@@ -11,6 +11,7 @@
 #include <ew/shader.h>
 #include <ew/procGen.h>
 #include <ew/transform.h>
+#include "HenLib/camera.h"
 
 void framebufferSizeCallback(GLFWwindow* window, int width, int height);
 
@@ -56,6 +57,17 @@ int main() {
 
 	ew::Shader shader("assets/vertexShader.vert", "assets/fragmentShader.frag");
 	
+	//Camera
+	HenLib::Camera camera;
+	camera.orthographic = false;
+	camera.position = ew::Vec3(0, 0, 5);
+	camera.target = (0, 0, 0);
+	camera.fov = 60.0;
+	camera.orthoSize = 6.0;
+	camera.nearPlane = 0.1;
+	camera.farPlane = 100;
+	camera.aspectRatio = SCREEN_WIDTH / SCREEN_HEIGHT;
+
 	//Cube mesh
 	ew::Mesh cubeMesh(ew::createCube(0.5f));
 
@@ -78,8 +90,10 @@ int main() {
 		//TODO: Set model matrix uniform
 		for (size_t i = 0; i < NUM_CUBES; i++)
 		{
-			//Construct model matrix
-			shader.setMat4("_Model", cubeTransforms[i].getModelMatrix());
+			//View Projection
+			ew::Mat4 viewProjection = cubeTransforms[i].getModelMatrix() 
+						 * camera.ProjectionMatrix() * camera.ViewMatrix();
+			shader.setMat4("_WVC", viewProjection);
 			cubeMesh.draw();
 		}
 
@@ -102,6 +116,15 @@ int main() {
 				ImGui::PopID();
 			}
 			ImGui::Text("Camera");
+			ImGui::Checkbox("Orthographic", &camera.orthographic);
+			if (camera.orthographic){
+				ImGui::SliderFloat("Ortho Height", &camera.orthoSize, 0.0f, 10.0f);
+			}
+			else {
+				ImGui::SliderFloat("FOV", &camera.fov, 0.0f, 180.0f);
+			}
+			ImGui::SliderFloat("Near Plane", &camera.nearPlane, 0.1f, 180.0f);
+			ImGui::SliderFloat("Far Plane", &camera.farPlane, 0.0f, 100.0f);
 			ImGui::End();
 			
 			ImGui::Render();
