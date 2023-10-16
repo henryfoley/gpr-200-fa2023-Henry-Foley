@@ -66,7 +66,7 @@ int main() {
 	camera.orthoSize = 6.0;
 	camera.nearPlane = 0.1;
 	camera.farPlane = 100;
-	camera.aspectRatio = SCREEN_WIDTH / SCREEN_HEIGHT;
+	camera.aspectRatio = float(SCREEN_WIDTH) / float(SCREEN_HEIGHT);
 
 	//Cube mesh
 	ew::Mesh cubeMesh(ew::createCube(0.5f));
@@ -93,8 +93,7 @@ int main() {
 		for (size_t i = 0; i < NUM_CUBES; i++)
 		{
 			//View Projection
-			ew::Mat4 viewProjection = cubeTransforms[i].getModelMatrix() 
-						 * camera.ProjectionMatrix() * camera.ViewMatrix();
+			ew::Mat4 viewProjection = camera.ProjectionMatrix() * camera.ViewMatrix() * cubeTransforms[i].getModelMatrix();
 			shader.setMat4("_WVC", viewProjection);
 			cubeMesh.draw();
 		}
