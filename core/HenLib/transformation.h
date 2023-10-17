@@ -98,7 +98,7 @@ namespace HenLib {
 	//Orthographic Projection
 	inline ew::Mat4 Orthographic(float height, float aspect, float near,
 		float far) {
-		float r = height * aspect;
+		float r = (height * aspect)/2;
 		float l = -r;
 		float t = height / 2;
 		float b = -t;

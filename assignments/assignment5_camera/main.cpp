@@ -87,9 +87,7 @@ int main() {
 		//Set uniforms
 		shader.use();
 
-		
 		//TODO: Set model matrix uniform
-		// LIKELY PROBLEM
 		for (size_t i = 0; i < NUM_CUBES; i++)
 		{
 			//View Projection
@@ -105,7 +103,7 @@ int main() {
 			ImGui::NewFrame();
 
 			ImGui::Begin("Settings");
-			ImGui::Text("Cubes");
+			/*ImGui::Text("Cubes");
 			for (size_t i = 0; i < NUM_CUBES; i++)
 			{
 				ImGui::PushID(i);
@@ -115,7 +113,7 @@ int main() {
 					ImGui::DragFloat3("Scale", &cubeTransforms[i].scale.x, 0.05f);
 				}
 				ImGui::PopID();
-			}
+			}*/
 			ImGui::Text("Camera");
 			ImGui::Checkbox("Orthographic", &camera.orthographic);
 			if (camera.orthographic){
@@ -124,6 +122,9 @@ int main() {
 			else {
 				ImGui::SliderFloat("FOV", &camera.fov, 0.0f, 180.0f);
 			}
+
+			ImGui::DragFloat3("Position", &camera.position.x, 0.05f);
+			ImGui::DragFloat3("Target", &camera.target.x, 0.05f);
 			ImGui::SliderFloat("Near Plane", &camera.nearPlane, 0.1f, 180.0f);
 			ImGui::SliderFloat("Far Plane", &camera.farPlane, 0.0f, 100.0f);
 			ImGui::End();
