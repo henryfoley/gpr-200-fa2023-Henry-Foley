@@ -22,7 +22,7 @@ const int SCREEN_HEIGHT = 720;
 const int NUM_CUBES = 4;
 ew::Transform cubeTransforms[NUM_CUBES];
 
-void moveCamera(GLFWwindow* window, HenLib::Camera* camera, HenLib::CameraControls* controls) {
+void moveCamera(GLFWwindow* window, HenLib::Camera* camera, HenLib::CameraControls* controls, float deltaTime) {
 	//If right mouse is not held, release cursor and return early
 	if (!glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_2)) {
 		//Release cursor
@@ -74,7 +74,37 @@ void moveCamera(GLFWwindow* window, HenLib::Camera* camera, HenLib::CameraContro
 	forward.z = sin(yawRadian) * cos(pitchRadian);
 	forward = ew::Normalize(forward);
 
+	//Camera right and up vectors
+	ew::Vec3 worldUp = {0,1,0};
+	ew::Vec3 right = ew::Normalize(ew::Cross(forward, worldUp));
+	ew::Vec3 up = ew::Normalize(ew::Cross(right,forward));
+
+	//Move by keys
+	if (glfwGetKey(window, GLFW_KEY_W)) {
+		camera->position += forward * controls->moveSpeed * deltaTime;
+	}
+	if (glfwGetKey(window, GLFW_KEY_S)) {
+		camera->position -= forward * controls->moveSpeed * deltaTime;
+	}
+	if (glfwGetKey(window, GLFW_KEY_A)) {
+		camera->position -= right * controls->moveSpeed * deltaTime;
+	}
+	if (glfwGetKey(window, GLFW_KEY_D)) {
+		camera->position += right * controls->moveSpeed * deltaTime;
+	}
+	if (glfwGetKey(window, GLFW_KEY_Q)) {
+		camera->position += up * controls->moveSpeed * deltaTime;
+	}
+	if (glfwGetKey(window, GLFW_KEY_E)) {
+		camera->position -= up * controls->moveSpeed * deltaTime;
+	}
+
+	//Change Target Pos
 	camera->target = camera->position + forward;
+	
+	
+	//Change Camera Pos
+
 }
 
 int main() {
@@ -127,6 +157,9 @@ int main() {
 	//Cube mesh
 	ew::Mesh cubeMesh(ew::createCube(0.5f));
 
+	//Timestamp of previous frame
+	float prevTime = 0.0f;
+
 	//Cube positions
 	for (size_t i = 0; i < NUM_CUBES; i++)
 	{
@@ -136,7 +169,13 @@ int main() {
 
 	while (!glfwWindowShouldClose(window)) {
 		glfwPollEvents();
-		moveCamera(window, &camera, &cameraControls);
+
+		//Calculate deltaTime
+		float time = (float)glfwGetTime(); //Timestamp of Current Frame
+		float deltaTime = time - prevTime;
+		prevTime = time;
+
+		moveCamera(window, &camera, &cameraControls, deltaTime);
 		glClearColor(0.3f, 0.4f, 0.9f, 1.0f);
 		//Clear both color buffer AND depth buffer
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
