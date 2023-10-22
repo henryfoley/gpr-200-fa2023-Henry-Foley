@@ -101,10 +101,6 @@ void moveCamera(GLFWwindow* window, HenLib::Camera* camera, HenLib::CameraContro
 
 	//Change Target Pos
 	camera->target = camera->position + forward;
-	
-	
-	//Change Camera Pos
-
 }
 
 int main() {
@@ -200,6 +196,8 @@ int main() {
 
 			ImGui::Begin("Settings");
 			ImGui::Text("Camera");
+			ImGui::DragFloat3("Position", &camera.position.x, 0.05f);
+			ImGui::DragFloat3("Target", &camera.target.x, 0.05f);
 			ImGui::Checkbox("Orthographic", &camera.orthographic);
 			if (camera.orthographic){
 				ImGui::SliderFloat("Ortho Height", &camera.orthoSize, 0.0f, 10.0f);
@@ -207,13 +205,18 @@ int main() {
 			else {
 				ImGui::SliderFloat("FOV", &camera.fov, 0.0f, 180.0f);
 			}
-
-			ImGui::DragFloat3("Position", &camera.position.x, 0.05f);
-			ImGui::DragFloat3("Target", &camera.target.x, 0.05f);
 			ImGui::SliderFloat("Near Plane", &camera.nearPlane, 0.1f, 180.0f);
 			ImGui::SliderFloat("Far Plane", &camera.farPlane, 0.0f, 100.0f);
+			ImGui::Text("Camera Controls");
+			ImGui::Text("Yaw: %f", cameraControls.yaw);
+			ImGui::Text("Pitch: %f", cameraControls.pitch);
+			if (ImGui::Button("Reset Camera Position"))
+			{
+				camera.position = ew::Vec3(0, 0, 5);
+				camera.target = (0, 0, 0);
+			}
+			ImGui::SliderFloat("Move Speed", &cameraControls.moveSpeed, 0.1f, 20.0f);
 			ImGui::End();
-			
 			ImGui::Render();
 			ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 		}
