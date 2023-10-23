@@ -37,6 +37,10 @@ void moveCamera(GLFWwindow* window, HenLib::Camera* camera, HenLib::CameraContro
 	double mouseX, mouseY;
 	glfwGetCursorPos(window, &mouseX, &mouseY);
 
+	//Apply Sensitivity
+	mouseX *= controls->mouseSensitivity;
+	mouseY *= controls->mouseSensitivity;
+
 	//If we just start right clicking, set prevMouse values to current position
 	//This prevents a bug where the camera moves as soon as we click
 	if (controls->firstMouse) {
@@ -216,6 +220,7 @@ int main() {
 				camera.target = (0, 0, 0);
 			}
 			ImGui::SliderFloat("Move Speed", &cameraControls.moveSpeed, 0.1f, 20.0f);
+			ImGui::SliderFloat("Mouse Sensitivity", &cameraControls.mouseSensitivity, 0.01f, 1.0f);
 			ImGui::End();
 			ImGui::Render();
 			ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
