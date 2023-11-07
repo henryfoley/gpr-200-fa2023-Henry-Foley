@@ -8,12 +8,15 @@
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
 
+
+
 #include <ew/shader.h>
 #include <ew/texture.h>
 #include <ew/procGen.h>
 #include <ew/transform.h>
 #include <ew/camera.h>
 #include <ew/cameraController.h>
+#include "HenLib/procGen.h"
 
 void framebufferSizeCallback(GLFWwindow* window, int width, int height);
 void resetCamera(ew::Camera& camera, ew::CameraController& cameraController);
@@ -29,8 +32,8 @@ struct AppSettings {
 
 	ew::Vec3 bgColor = ew::Vec3(0.1f);
 	ew::Vec3 shapeColor = ew::Vec3(1.0f);
-	bool wireframe = true;
-	bool drawAsPoints = false;
+	bool wireframe = false;
+	bool drawAsPoints = true;
 	bool backFaceCulling = true;
 
 	//Euler angles (degrees)
@@ -78,12 +81,19 @@ int main() {
 	ew::Shader shader("assets/vertexShader.vert", "assets/fragmentShader.frag");
 	unsigned int brickTexture = ew::loadTexture("assets/brick_color.jpg",GL_REPEAT,GL_LINEAR);
 
-	//Create cube
+	//Create Cube
 	ew::MeshData cubeMeshData = ew::createCube(0.5f);
 	ew::Mesh cubeMesh(cubeMeshData);
 
+	//Create Plane
+	int subdivisions = 10;
+	ew::MeshData planeMeshData = HenLib::createPlane(subdivisions,1.0f,1.0f);
+	ew::Mesh planeMesh(planeMeshData);
+
 	//Initialize transforms
 	ew::Transform cubeTransform;
+	ew::Transform planeTransform;
+	planeTransform.position = ew::Vec3(1.0f, -0.25f, 0.5f);
 
 	resetCamera(camera,cameraController);
 
@@ -102,7 +112,6 @@ int main() {
 
 		//Clear both color buffer AND depth buffer
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
 		
 
 		shader.use();
@@ -120,6 +129,10 @@ int main() {
 		//Draw cube
 		shader.setMat4("_Model", cubeTransform.getModelMatrix());
 		cubeMesh.draw((ew::DrawMode)appSettings.drawAsPoints);
+
+		//Draw Plane
+		shader.setMat4("_Model", planeTransform.getModelMatrix());
+		planeMesh.draw((ew::DrawMode)appSettings.drawAsPoints);
 
 		//Render UI
 		{
@@ -163,6 +176,9 @@ int main() {
 				else
 					glDisable(GL_CULL_FACE);
 			}
+
+			//ImGui::DragInt("Plane Subdivisions", &subdivisions, 1, 5);
+
 			ImGui::End();
 			
 			ImGui::Render();
