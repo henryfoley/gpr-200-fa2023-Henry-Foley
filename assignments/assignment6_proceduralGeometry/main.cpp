@@ -90,10 +90,24 @@ int main() {
 	ew::MeshData planeMeshData = HenLib::createPlane(subdivisions,1.0f,1.0f);
 	ew::Mesh planeMesh(planeMeshData);
 
+	//Create Cylinder
+	int numCylinderSegments = 12;
+	ew::MeshData cylinderMeshData = HenLib::createCylinder(0.5f, 0.25f, numCylinderSegments);
+	ew::Mesh cylinderMesh(cylinderMeshData);
+
+	//Create Sphere
+	int numSphereSegments = 10;
+	ew::MeshData sphereMeshData = HenLib::createSphere(0.5f, numSphereSegments);
+	ew::Mesh sphereMesh(sphereMeshData);
+
 	//Initialize transforms
 	ew::Transform cubeTransform;
 	ew::Transform planeTransform;
+	ew::Transform cylinderTransform;
+	ew::Transform sphereTransform;
 	planeTransform.position = ew::Vec3(1.0f, -0.25f, 0.5f);
+	cylinderTransform.position = ew::Vec3(3.0f, 0.0f, 0.0f);
+	sphereTransform.position = ew::Vec3(5.0f, 0.0f, 0.0f);
 
 	resetCamera(camera,cameraController);
 
@@ -133,6 +147,14 @@ int main() {
 		//Draw Plane
 		shader.setMat4("_Model", planeTransform.getModelMatrix());
 		planeMesh.draw((ew::DrawMode)appSettings.drawAsPoints);
+
+		//Draw Cylinder
+		shader.setMat4("_Model", cylinderTransform.getModelMatrix());
+		cylinderMesh.draw((ew::DrawMode)appSettings.drawAsPoints);
+
+		//Draw Sphere
+		shader.setMat4("_Model", sphereTransform.getModelMatrix());
+		sphereMesh.draw((ew::DrawMode)appSettings.drawAsPoints);
 
 		//Render UI
 		{
