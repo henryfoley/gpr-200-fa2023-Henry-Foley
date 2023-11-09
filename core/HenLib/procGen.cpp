@@ -51,9 +51,8 @@ namespace HenLib {
 	/// Creates a Cylinder
 	ew::MeshData createCylinder(float height, float radius, int numSegments) {
 		ew::MeshData mesh;
-		//todo: These calculations are most likely wrong
-		int numberOfVerts = (numSegments + 1) * 3;
-		int numberOfIndices = (2 * numSegments) + ((numSegments * 3) * 4);
+		int numberOfVerts = (numSegments + 1) * 4 + 2;
+		int numberOfIndices = (2 * numSegments) + ((numSegments * 4) * 4);
 		mesh.vertices.reserve(numberOfVerts);
 		mesh.indices.reserve(numberOfIndices);
 		
@@ -83,6 +82,8 @@ namespace HenLib {
 			vertex.normal = ew::Vec3(0.0f, 1.0f, 0.0f);
 			mesh.vertices.push_back(vertex);
 		}
+		//Top Side Ring Index
+		int topSideIndex = mesh.vertices.size()-1;
 
 		//Top Side Ring Vertices
 		for (int i = 0; i <= numSegments; i++) {
@@ -92,12 +93,13 @@ namespace HenLib {
 			vertex.pos.x = cos(theta) * radius;
 			vertex.pos.y = topY;
 			vertex.pos.z = sin(theta) * radius;
+			//UVs
+			vertex.uv.x = i / float(numSegments);
+			vertex.uv.y = 1.0;
 			//Normals
 			vertex.normal = ew::Normalize(vertex.pos - topVertex.pos);
 			mesh.vertices.push_back(vertex);
 		}
-		//Top Side Ring Index
-		int topSideIndex = mesh.vertices.size();
 
 		//Bottom Side Ring Vertices
 		for (int i = 0; i <= numSegments; i++) {
@@ -107,6 +109,8 @@ namespace HenLib {
 			vertex.pos.x = cos(theta) * radius;
 			vertex.pos.y = bottomY;
 			vertex.pos.z = sin(theta) * radius;
+			//UVs
+			vertex.uv = ew::Vec2(i, 0.0) / float(numSegments);
 			//Normals
 			vertex.normal = ew::Normalize(vertex.pos - ew::Vec3(0.0f, bottomY, 0.0f));
 			mesh.vertices.push_back(vertex);
@@ -126,11 +130,11 @@ namespace HenLib {
 			vertex.normal = ew::Vec3(0.0f, -1.0f, 0.0f);
 			mesh.vertices.push_back(vertex);
 		}
-
+		
 		//Bottom Vertex
 		ew::Vertex bottomVertex;
 		bottomVertex.pos = ew::Vec3(0.0f, bottomY, 0.0f);
-		topVertex.uv = ew::Vec2(0.5f, 0.5f);
+		bottomVertex.uv = ew::Vec2(0.5f, 0.5f);
 		bottomVertex.normal = ew::Vec3(0.0f, -1.0f, 0.0f);
 		mesh.vertices.push_back(bottomVertex);
 
@@ -144,13 +148,11 @@ namespace HenLib {
 			mesh.indices.push_back(topStart + i + 1);
 		}
 
-		//todo: This it not working properly
-
 		//Side Indices
-		/*unsigned int sideStart = topSideIndex;
+		unsigned int sideStart = topSideIndex;
 		unsigned int columns = numSegments + 1;
 		for (int i = 0; i < columns; i++) {
-			unsigned int startVertex = sideStart + 1;
+			unsigned int startVertex = sideStart + i;
 			// Triangle 1
 			mesh.indices.push_back(startVertex);
 			mesh.indices.push_back(startVertex + 1);
@@ -159,16 +161,16 @@ namespace HenLib {
 			mesh.indices.push_back(startVertex + columns + 1);
 			mesh.indices.push_back(startVertex + columns);
 			mesh.indices.push_back(startVertex);
-		}*/
+		}
 
 		//Bottom Cap Indices
-		unsigned int bottomCenter = mesh.indices.size() + 1;
-		unsigned int bottomStart = bottomCenter + 1;
+		unsigned int bottomCenter = mesh.vertices.size() - 1;
+		unsigned int bottomStart = bottomCenter - (numSegments + 1);
 		
 		for (int i = 0; i < numSegments; i++) {
-			mesh.indices.push_back(bottomStart + i);
-			mesh.indices.push_back(bottomCenter);
 			mesh.indices.push_back(bottomStart + i + 1);
+			mesh.indices.push_back(bottomCenter);
+			mesh.indices.push_back(bottomStart + i);
 		}
 
 
@@ -197,12 +199,8 @@ namespace HenLib {
 				vertex.pos.y = radius * cos(phi);
 				vertex.pos.z = radius * sin(theta) * sin(phi);
 				//UVs
-				//todo: This does not work properly
-				float uvPhi = atan2(vertex.pos.y, vertex.pos.x);
-				float uvTheta = asin(vertex.pos.z/radius);
-				vertex.uv.x = (uvPhi + ew::PI) / ew::TAU;
-				vertex.uv.y = (uvTheta + ew::PI) / ew::PI;
-				ew::Normalize(vertex.uv);
+				vertex.uv.x = col / float(numSegments);
+				vertex.uv.y = 1.0 - (row / float(numSegments));
 				//Normals
 				vertex.normal = ew::Normalize(vertex.pos);
 				mesh.vertices.push_back(vertex);
@@ -233,15 +231,13 @@ namespace HenLib {
 			}
 		}
 		//Bottom Cap
-		//todo: Still not working properly
-		unsigned int bottomPoleStart = mesh.vertices.size();
-		unsigned int bottomSideStart = bottomPoleStart - 1;
+		unsigned int bottomCenter = mesh.vertices.size()-1 - numSegments;
+		unsigned int bottomSideStart = bottomCenter - (numSegments + 1);
 		for (int i = 0; i < numSegments; i++) {
-			mesh.indices.push_back(bottomSideStart + i);
-			mesh.indices.push_back(bottomPoleStart + i);
 			mesh.indices.push_back(bottomSideStart + i + 1);
+			mesh.indices.push_back(bottomCenter + i);	//Pole
+			mesh.indices.push_back(bottomSideStart + i);
 		}
-
 		return mesh;
 	}
 }
