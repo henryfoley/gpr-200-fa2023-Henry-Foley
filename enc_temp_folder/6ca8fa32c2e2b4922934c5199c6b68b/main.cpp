@@ -140,7 +140,7 @@ int main() {
 		shader.setVec3("_Lights[0].position", lights[0].position);
 		shader.setVec3("_Lights[0].color", lights[0].color);
 		for (int i = 0; i < MAX_LIGHTS - 1; i++) {
-			unlitShader.setMat4("_Model", ew::Mat4(lights[0].position, 1.0f));
+			unlitShader.setVec3("_Model", lights[0].position);
 			unlitShader.setMat4("_ViewProjection", camera.ProjectionMatrix()* camera.ViewMatrix());
 			unlitShader.setVec3("_Color", lights[0].color);
 			sphereMesh.draw();
