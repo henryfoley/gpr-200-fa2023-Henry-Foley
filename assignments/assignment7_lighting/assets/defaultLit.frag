@@ -17,6 +17,7 @@ struct Light{
 uniform Light _Lights[MAX_LIGHTS];
 uniform sampler2D _Texture;
 uniform vec3 _CameraPos;
+uniform int _numLights;
 
 //Material Properties
 uniform float _AmbientK; 
@@ -29,7 +30,7 @@ void main(){
 	vec3 normal = normalize(fs_in.WorldNormal);
 	vec4 result = vec4(0,0,0,0.0);
 	float intensity = 0.5f;
-	for(int i = 0; i < MAX_LIGHTS; i++){
+	for(int i = 0; i < _numLights; i++){
 
 		//Position Calculations
 		vec3 lightDir = normalize(_Lights[i].position - fs_in.WorldPosition);

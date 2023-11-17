@@ -129,6 +129,9 @@ int main() {
 	sphereTransform.position = ew::Vec3(-1.5f, 0.0f, 0.0f);
 	cylinderTransform.position = ew::Vec3(1.5f, 0.0f, 0.0f);
 
+	//Number of Rendered Lights
+	int numLights = MAX_LIGHTS;
+
 	resetCamera(camera,cameraController);
 
 	while (!glfwWindowShouldClose(window)) {
@@ -149,10 +152,11 @@ int main() {
 		shader.use();
 		glBindTexture(GL_TEXTURE_2D, brickTexture);
 
-		//Texture, Projection & Camera Pos
+		//Texture, Projection, Camera Pos & Number of Rendered Lights
 		shader.setInt("_Texture", 0);
 		shader.setMat4("_ViewProjection", camera.ProjectionMatrix() * camera.ViewMatrix());
 		shader.setVec3("_CameraPos", camera.position);
+		shader.setInt("_numLights", numLights);
 
 		//Draw shapes
 		shader.setMat4("_Model", cubeTransform.getModelMatrix());
@@ -168,7 +172,7 @@ int main() {
 		cylinderMesh.draw();
 
 		//Point lights
-		for (int i = 0; i < MAX_LIGHTS; i++) {
+		for (int i = 0; i < numLights; i++) {
 			shader.setVec3("_Lights[" + std::to_string(i) + "].position", lights[i].position);
 			shader.setVec3("_Lights[" + std::to_string(i) + "].color", lights[i].color);
 			shader.setFloat("_Lights[" + std::to_string(i) + "].intensity", lights[i].intensity);
@@ -185,11 +189,11 @@ int main() {
 		unlitShader.setMat4("_ViewProjection", camera.ProjectionMatrix()* camera.ViewMatrix());
 
 		//Update Light Position
-		for (int i = 0; i < MAX_LIGHTS; i++) {
+		for (int i = 0; i < numLights; i++) {
 			lightSphereTransform[i].position = lights[i].position;
 		}
 
-		for (int i = 0; i < MAX_LIGHTS; i++) {
+		for (int i = 0; i < numLights; i++) {
 			unlitShader.setMat4("_Model", lightSphereTransform[i].getModelMatrix());
 			unlitShader.setVec3("_Color", lights[i].color);
 			sphereMesh.draw();
@@ -222,7 +226,8 @@ int main() {
 			}
 
 			//Lights Controls
-			if (ImGui::CollapsingHeader("Lights")) {
+			ImGui::SliderInt("Number of Lights", &numLights, 0, MAX_LIGHTS);
+			if (ImGui::CollapsingHeader("Light Controls")) {
 				for (int i = 0; i < MAX_LIGHTS; i++) {
 					ImGui::PushID(i);
 					ImGui::ColorEdit3("Color", &lights[i].color.x, 0.1f);
