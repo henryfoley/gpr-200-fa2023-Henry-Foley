@@ -67,6 +67,7 @@ int main() {
 	struct Light {
 		ew::Vec3 position; //World Space
 		ew::Vec3 color; //RGB
+		float intensity; //Light Intensity
 	};
 
 	//Material Struct
@@ -80,11 +81,38 @@ int main() {
 	//Create Light
 	Light lights[MAX_LIGHTS];
 	ew::Mesh lightSphereMesh(ew::createSphere(0.5f, 64));
-	//ew::Transform lightSphereMesh[4];
+	ew::Transform lightSphereTransform[MAX_LIGHTS];
 
-	//Light Transforms and Colors
-	lights[0].position = ew::Vec3(0, 2.0, 0);
-	lights[0].color = ew::Vec3(0, 1.0, 0);
+	//Light Transforms, Colors & Intensity
+	lights[0].color = ew::Vec3(1, 1, 1);
+	lights[0].position = ew::Vec3(-3, 3, -3);
+	lights[0].intensity = 1.0f;
+
+	lights[1].color = ew::Vec3(1, 0, 0);
+	lights[1].position = ew::Vec3(-3, 3, 3);
+	lights[1].intensity = 1.0f;
+
+	lights[2].color = ew::Vec3(0, 1, 0);
+	lights[2].position = ew::Vec3(3, 3, 3);
+	lights[2].intensity = 1.0f;
+
+	lights[3].color = ew::Vec3(0, 0, 1);
+	lights[3].position = ew::Vec3(3, 3, -3);
+	lights[3].intensity = 1.0f;
+
+	//Light Sphere Transforms
+	ew::Vec3 lightSphereScale = ew::Vec3(0.5, 0.5, 0.5);
+	for (int i = 0; i < MAX_LIGHTS; i++) {
+		lightSphereTransform[i].position = lights[i].position;
+		lightSphereTransform[i].scale = lightSphereScale;
+	}
+
+	//Material
+	Material brickMat;
+	brickMat.ambientK = 0.05f;
+	brickMat.diffuseK = 0.75f;
+	brickMat.specular = 0.2f;
+	brickMat.shininess = 16.0f;
 
 	//Create cube
 	ew::Mesh cubeMesh(ew::createCube(1.0f));
@@ -120,8 +148,11 @@ int main() {
 
 		shader.use();
 		glBindTexture(GL_TEXTURE_2D, brickTexture);
+
+		//Texture, Projection & Camera Pos
 		shader.setInt("_Texture", 0);
 		shader.setMat4("_ViewProjection", camera.ProjectionMatrix() * camera.ViewMatrix());
+		shader.setVec3("_CameraPos", camera.position);
 
 		//Draw shapes
 		shader.setMat4("_Model", cubeTransform.getModelMatrix());
@@ -137,12 +168,25 @@ int main() {
 		cylinderMesh.draw();
 
 		//Point lights
-		shader.setVec3("_Lights[0].position", lights[0].position);
-		shader.setVec3("_Lights[0].color", lights[0].color);
-		for (int i = 0; i < MAX_LIGHTS - 1; i++) {
-			unlitShader.setMat4("_Model", ew::Mat4(lights[0].position, 1.0f));
-			unlitShader.setMat4("_ViewProjection", camera.ProjectionMatrix()* camera.ViewMatrix());
-			unlitShader.setVec3("_Color", lights[0].color);
+		for (int i = 0; i < MAX_LIGHTS; i++) {
+			shader.setVec3("_Lights[" + std::to_string(i) + "].position", lights[i].position);
+			shader.setVec3("_Lights[" + std::to_string(i) + "].color", lights[i].color);
+			shader.setFloat("_Light[" + std::to_string(i) + "].intensity", lights[i].intensity);
+		}
+
+		//Material
+		shader.setFloat("_AmbientK", brickMat.ambientK);
+		shader.setFloat("_DiffuseK", brickMat.diffuseK);
+		shader.setFloat("_Specular", brickMat.specular);
+		shader.setFloat("_Shininess", brickMat.shininess);
+
+		//Light Meshes
+		unlitShader.use();
+		unlitShader.setMat4("_ViewProjection", camera.ProjectionMatrix()* camera.ViewMatrix());
+
+		for (int i = 0; i < MAX_LIGHTS; i++) {
+			unlitShader.setMat4("_Model", lightSphereTransform[i].getModelMatrix());
+			unlitShader.setVec3("_Color", lights[i].color);
 			sphereMesh.draw();
 		}
 
