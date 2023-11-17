@@ -37,25 +37,19 @@ void main(){
 		vec3 halfwayDir = normalize(lightDir + viewDir);
 
 		//Ambient
-		//vec3 ambient = _Lights[i].color * _AmbientK;
-		vec3 ambient = vec3(0,0,1) * _AmbientK;
+		vec3 ambient = _Lights[i].color * _AmbientK;
 
 		//Diffuse
 		float diff = max(dot(normal, lightDir), 0.0) * _DiffuseK;
-		//vec3 diffuse = _Lights[i].color * diff;
-		vec3 diffuse = vec3(0,0,1) * diff;
+		vec3 diffuse = _Lights[i].color * diff;
 		
 		//Specular
 		float spec = pow(max(dot(normal, halfwayDir), 0.0), _Shininess) * _Specular;
-		//vec3 specular = _Lights[i].color * spec;
-		vec3 specular = vec3(0,0,1) * spec;
+		vec3 specular = _Lights[i].color * spec;
 
-		result += vec4((diff + specular + ambient), 1.0);
-		result *= intensity;
-		if(i == 3){
-			result *= 5; 
-		}
-
+		//Combine to Blinn Phong
+		result += vec4((diffuse + specular + ambient), 1.0);
+		result *= _Lights[i].intensity;
 	}
 
 	FragColor =  result * texture(_Texture,fs_in.UV);

@@ -84,20 +84,20 @@ int main() {
 	ew::Transform lightSphereTransform[MAX_LIGHTS];
 
 	//Light Transforms, Colors & Intensity
-	lights[0].color = ew::Vec3(1, 1, 1);
-	lights[0].position = ew::Vec3(-3, 3, -3);
+	lights[0].color = ew::Vec3(1, 1, 0);
+	lights[0].position = ew::Vec3(-2, 2, -2);
 	lights[0].intensity = 1.0f;
 
 	lights[1].color = ew::Vec3(1, 0, 0);
-	lights[1].position = ew::Vec3(-3, 3, 3);
+	lights[1].position = ew::Vec3(-2, 2, 2);
 	lights[1].intensity = 1.0f;
 
 	lights[2].color = ew::Vec3(0, 1, 0);
-	lights[2].position = ew::Vec3(3, 3, 3);
+	lights[2].position = ew::Vec3(2, 2, 2);
 	lights[2].intensity = 1.0f;
 
 	lights[3].color = ew::Vec3(0, 0, 1);
-	lights[3].position = ew::Vec3(3, 3, -3);
+	lights[3].position = ew::Vec3(2, 2, -2);
 	lights[3].intensity = 1.0f;
 
 	//Light Sphere Transforms
@@ -109,10 +109,10 @@ int main() {
 
 	//Material
 	Material brickMat;
-	brickMat.ambientK = 0.05f;
-	brickMat.diffuseK = 0.75f;
-	brickMat.specular = 0.2f;
-	brickMat.shininess = 16.0f;
+	brickMat.ambientK = 0.075f;
+	brickMat.diffuseK = 0.5f;
+	brickMat.specular = 0.5f;
+	brickMat.shininess = 10.0f;
 
 	//Create cube
 	ew::Mesh cubeMesh(ew::createCube(1.0f));
@@ -171,7 +171,7 @@ int main() {
 		for (int i = 0; i < MAX_LIGHTS; i++) {
 			shader.setVec3("_Lights[" + std::to_string(i) + "].position", lights[i].position);
 			shader.setVec3("_Lights[" + std::to_string(i) + "].color", lights[i].color);
-			shader.setFloat("_Light[" + std::to_string(i) + "].intensity", lights[i].intensity);
+			shader.setFloat("_Lights[" + std::to_string(i) + "].intensity", lights[i].intensity);
 		}
 
 		//Material
@@ -183,6 +183,11 @@ int main() {
 		//Light Meshes
 		unlitShader.use();
 		unlitShader.setMat4("_ViewProjection", camera.ProjectionMatrix()* camera.ViewMatrix());
+
+		//Update Light Position
+		for (int i = 0; i < MAX_LIGHTS; i++) {
+			lightSphereTransform[i].position = lights[i].position;
+		}
 
 		for (int i = 0; i < MAX_LIGHTS; i++) {
 			unlitShader.setMat4("_Model", lightSphereTransform[i].getModelMatrix());
@@ -214,6 +219,25 @@ int main() {
 				if (ImGui::Button("Reset")) {
 					resetCamera(camera, cameraController);
 				}
+			}
+
+			//Lights Controls
+			if (ImGui::CollapsingHeader("Lights")) {
+				for (int i = 0; i < MAX_LIGHTS; i++) {
+					ImGui::PushID(i);
+					ImGui::ColorEdit3("Color", &lights[i].color.x, 0.1f);
+					ImGui::DragFloat3("Position" , &lights[i].position.x, 0.1f);
+					ImGui::SliderFloat("Intensity", &lights[i].intensity, 0.0f, 3.0f);
+					ImGui::PopID();
+				}
+			}
+
+			//Material Controls
+			if (ImGui::CollapsingHeader("Materials")) {
+				ImGui::SliderFloat("Material Ambient", &brickMat.ambientK, 0.0f, 1.0f);
+				ImGui::SliderFloat("Material Diffuse", &brickMat.diffuseK, 0.0f, 1.0f);
+				ImGui::SliderFloat("Material Specular", &brickMat.specular, 0.0f, 1.0f);
+				ImGui::SliderFloat("Material Shininess", &brickMat.shininess, 2.0f, 30.0f);
 			}
 
 			ImGui::ColorEdit3("BG color", &bgColor.x);
